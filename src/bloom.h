@@ -99,6 +99,16 @@ public:
 
     //! Checks for empty and full filters to avoid wasting cpu
     void UpdateEmptyFull();
+
+
+    
+    std::vector<unsigned char> getvData();
+    bool getisFull();
+    bool getisEmpty();
+    unsigned int getnHashFuncs();
+    unsigned int getnTweak();
+    unsigned char getnFlags();
+
 };
 
 /**
@@ -115,6 +125,7 @@ public:
 
     void insert(const std::vector<unsigned char>& vKey);
     bool contains(const std::vector<unsigned char>& vKey) const;
+
 
     void clear();
 

@@ -25,6 +25,8 @@
 #include "validationinterface.h"
 
 #include <sstream>
+#include <fstream>
+#include <string>
 
 #include <boost/algorithm/string/replace.hpp>
 #include <boost/filesystem.hpp>
@@ -4656,6 +4658,28 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv, 
             delete pfrom->pfilter;
             pfrom->pfilter = new CBloomFilter(filter);
             pfrom->pfilter->UpdateEmptyFull();
+
+	    time_t     now = time(0);
+    	    struct tm  tstruct;
+    	    char       buf[80];
+            tstruct = *localtime(&now);
+    	    strftime(buf, sizeof(buf), "%Y-%m-%d.%X", &tstruct);
+
+            ofstream outfile;
+	    outfile.open("filterload.txt", std::ios_base::app);
+	    outfile << "----------------------------------------" << endl;
+	    outfile << "filterload: " << buf << std::endl;
+	    outfile << "Data: "  << std::endl;
+	    vector<unsigned char> filtervData = pfrom->pfilter->getvData();
+	    outfile.write((char*)&filtervData[0], filtervData.size() * sizeof(unsigned char));
+    	    outfile << endl << "isEmpty: " << pfrom->pfilter->getisEmpty() << std::endl;
+    	    outfile << "isFull: " << pfrom->pfilter->getisFull() << std::endl;
+    	    outfile << "nHashFuncs: " << pfrom->pfilter->getnHashFuncs() << std::endl;
+    	    outfile << "nTweak: " << pfrom->pfilter->getnTweak() << std::endl;
+    	    outfile << "nFlags: " << pfrom->pfilter->getnFlags() << std::endl;
+	    outfile << "----------------------------------------" << endl;
+
+
         }
         pfrom->fRelayTxes = true;
     }
@@ -4673,10 +4697,32 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv, 
             Misbehaving(pfrom->GetId(), 100);
         } else {
             LOCK(pfrom->cs_filter);
-            if (pfrom->pfilter)
+            if (pfrom->pfilter){
                 pfrom->pfilter->insert(vData);
-            else
+		    
+		    time_t     now = time(0);
+	    	    struct tm  tstruct;
+	    	    char       buf[80];
+		    tstruct = *localtime(&now);
+	    	    strftime(buf, sizeof(buf), "%Y-%m-%d.%X", &tstruct);
+
+		    ofstream outfile;
+		    outfile << "----------------------------------------" << endl;
+		    outfile.open("filterload.txt", std::ios_base::app);
+		    outfile << "filteradd: " << buf << std::endl;
+		    outfile << "Data: "  << std::endl;
+		    vector<unsigned char> filtervData = pfrom->pfilter->getvData();
+		    outfile.write((char*)&filtervData[0], filtervData.size() * sizeof(unsigned char));
+	    	    outfile << endl << "isEmpty: " << pfrom->pfilter->getisEmpty() << std::endl;
+	    	    outfile << "isFull: " << pfrom->pfilter->getisFull() << std::endl;
+	    	    outfile << "nHashFuncs: " << pfrom->pfilter->getnHashFuncs() << std::endl;
+	    	    outfile << "nTweak: " << pfrom->pfilter->getnTweak() << std::endl;
+	    	    outfile << "nFlags: " << pfrom->pfilter->getnFlags() << std::endl;
+		    outfile << "----------------------------------------" << endl;
+	    }
+            else {
                 Misbehaving(pfrom->GetId(), 100);
+	    }
         }
     }
 
@@ -4687,6 +4733,27 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv, 
         delete pfrom->pfilter;
         pfrom->pfilter = new CBloomFilter();
         pfrom->fRelayTxes = true;
+
+		    time_t     now = time(0);
+	    	    struct tm  tstruct;
+	    	    char       buf[80];
+		    tstruct = *localtime(&now);
+	    	    strftime(buf, sizeof(buf), "%Y-%m-%d.%X", &tstruct);
+
+		    ofstream outfile;
+		    outfile << "----------------------------------------" << endl;
+		    outfile.open("filterload.txt", std::ios_base::app);
+		    outfile << "filterclear: " << buf << std::endl;
+		    outfile << "Data: "  << std::endl;
+		    vector<unsigned char> filtervData = pfrom->pfilter->getvData();
+		    outfile.write((char*)&filtervData[0], filtervData.size() * sizeof(unsigned char));
+	    	    outfile << endl << "isEmpty: " << pfrom->pfilter->getisEmpty() << std::endl;
+	    	    outfile << "isFull: " << pfrom->pfilter->getisFull() << std::endl;
+	    	    outfile << "nHashFuncs: " << pfrom->pfilter->getnHashFuncs() << std::endl;
+	    	    outfile << "nTweak: " << pfrom->pfilter->getnTweak() << std::endl;
+	    	    outfile << "nFlags: " << pfrom->pfilter->getnFlags() << std::endl;
+		    outfile << "----------------------------------------" << endl;
+
     }
 
 

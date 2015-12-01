@@ -10,9 +10,11 @@
 #include "script/standard.h"
 #include "streams.h"
 
+#include <fstream>
+
 #include <math.h>
 #include <stdlib.h>
-
+#include <vector>
 #include <boost/foreach.hpp>
 
 #define LN2SQUARED 0.4804530139182014246671025263266649717305529515945455
@@ -128,7 +130,12 @@ bool CBloomFilter::IsWithinSizeConstraints() const
 
 bool CBloomFilter::IsRelevantAndUpdate(const CTransaction& tx)
 {
-    bool fFound = false;
+/*            ofstream outfile;
+	    outfile.open("filterload.txt", std::ios_base::app);
+	    outfile << "--------------------" << endl;
+	    outfile << "running CBloomFilter::IsRelevantAndUpdate() on: " << tx.ToString() << endl;
+	    outfile << "--------------------" << endl;
+*/  bool fFound = false;
     // Match if the filter contains the hash of tx
     //  for finding tx when they appear in a block
     if (isFull)
@@ -248,3 +255,13 @@ void CRollingBloomFilter::clear()
     b2.clear();
     nInsertions = 0;
 }
+
+
+
+    std::vector<unsigned char> CBloomFilter::getvData(){return this->vData;}
+    bool CBloomFilter::getisFull(){return this->isFull;}
+    bool CBloomFilter::getisEmpty(){return this->isEmpty;}
+    unsigned int CBloomFilter::getnHashFuncs(){return this->nHashFuncs;}
+    unsigned int CBloomFilter::getnTweak(){return this->nTweak;}
+    unsigned char CBloomFilter::getnFlags(){return this->nFlags;}
+
